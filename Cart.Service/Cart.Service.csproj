@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Cart.Domain\Cart.Domain.csproj" />
+    <ProjectReference Include="..\Cart.Repo\Cart.Repo.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Purchase\" />
+  </ItemGroup>
+
+</Project>
