@@ -1,5 +1,5 @@
-﻿using Cart.Domain;
-using Cart.Service;
+﻿using MFS.Domain;
+using MFS.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -7,15 +7,13 @@ using RS2.Core;
 using System;
 using System.Threading.Tasks;
 
-namespace Cart.Api.Controllers
+namespace MFS.Api.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Policy = Constants.ReadOnlyAccess)]
     public class ProductsController : ControllerBase
     {
         private IProductService _productService;
-        private IUnitOfWork _unitOfWork;
-        private readonly IHostingEnvironment env;
 
         public ProductsController(IProductService productService)
         {
@@ -49,6 +47,7 @@ namespace Cart.Api.Controllers
 
         // POST: api/Products
         [HttpPost]
+        [Authorize(Policy = Constants.AddEditAccess)]
         public async Task<IActionResult> Post([FromBody] Product product)
         {
             var id = await _productService.SaveProduct(product);
@@ -66,6 +65,8 @@ namespace Cart.Api.Controllers
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id:int}")]
+        [Authorize(Policy = Constants.AddEditDeleteAccess)]
+
         public async Task<IActionResult> Delete(int id)
         {
 

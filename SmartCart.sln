@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cart.Api", "CartApi\Cart.Api.csproj", "{5DDF8A7A-F9A8-4EBD-A27C-DC05B8F5C0D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MFS.Api", "CartApi\MFS.Api.csproj", "{5DDF8A7A-F9A8-4EBD-A27C-DC05B8F5C0D1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cart.Domain", "Cart.Domain\Cart.Domain.csproj", "{09AAD3FE-3D34-4B94-8B27-BB6F8B0448D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MFS.Domain", "Cart.Domain\MFS.Domain.csproj", "{09AAD3FE-3D34-4B94-8B27-BB6F8B0448D8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cart.Data", "Cart.Data\Cart.Data.csproj", "{C94D4D58-0712-42FF-8699-2E7D622E198C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MFS.Data", "Cart.Data\MFS.Data.csproj", "{C94D4D58-0712-42FF-8699-2E7D622E198C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cart.Repo", "Cart.Repo\Cart.Repo.csproj", "{D7EB25EA-D1F9-4A7D-88F8-C5D41BB79D86}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MFS.Repo", "Cart.Repo\MFS.Repo.csproj", "{D7EB25EA-D1F9-4A7D-88F8-C5D41BB79D86}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cart.Service", "Cart.Service\Cart.Service.csproj", "{95D9700D-F082-4B9B-876A-D024782373BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MFS.Service", "Cart.Service\MFS.Service.csproj", "{95D9700D-F082-4B9B-876A-D024782373BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

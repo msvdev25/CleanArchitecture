@@ -1,12 +1,10 @@
-﻿using Cart.Domain;
-using Cart.Repo;
-using Microsoft.Extensions.Logging;
+﻿using MFS.Domain;
+using MFS.Repo;
 using RS2.Core;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Cart.Service
+namespace MFS.Service
 {
     public interface ICategoryService
     {
@@ -19,7 +17,7 @@ namespace Cart.Service
         Task<bool> DeleteCategory(int Id);
     }
 
-    public class CategoryService : ICategoryService
+    internal class CategoryService : ICategoryService
     {
         private readonly ICategoryRepository categoryRepository;
         private readonly IUnitOfWork unitOfWork;

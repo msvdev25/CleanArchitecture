@@ -1,11 +1,11 @@
-﻿using Cart.Domain;
+﻿using MFS.Domain;
 using Microsoft.Extensions.Logging;
 using RS2.Core;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Cart.Repo
+namespace MFS.Repo
 {
 
     public interface ICountryRepository:IGetRepository<Country, int> { }

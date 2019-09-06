@@ -1,5 +1,5 @@
-﻿using Cart.Domain;
-using Cart.Service;
+﻿using MFS.Domain;
+using MFS.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -8,10 +8,10 @@ using System;
 using System.Threading.Tasks;
 using System.Transactions;
 
-namespace Cart.Api.Controllers
+namespace MFS.Api.Controllers
 {
     [Route("api/[controller]")]
- 	[Authorize]
+ 	[Authorize(Policy = Constants.ReadOnlyAccess)]
     public class CategoriesController : ControllerBase
     {
 
@@ -56,6 +56,7 @@ namespace Cart.Api.Controllers
 
         // POST: api/Categories
         [HttpPost]
+        [Authorize(Policy = Constants.AddEditAccess)]
         public async Task<IActionResult> Post([FromBody] Category category)
         {
             int id = await _categoryService.SaveCategory(category);
@@ -68,6 +69,7 @@ namespace Cart.Api.Controllers
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
+        [Authorize(Policy = Constants.AddEditDeleteAccess)]
         public async Task<IActionResult> Delete(int id)
         {
 			using (var tran = _unitOfWork.DataContext.Database.BeginTransaction())

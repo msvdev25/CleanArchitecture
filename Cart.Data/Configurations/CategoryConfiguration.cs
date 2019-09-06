@@ -1,8 +1,8 @@
-﻿using Cart.Domain;
+﻿using MFS.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Cart.Data
+namespace MFS.Data
 {
     internal class CategoryConfiguration : IEntityTypeConfiguration<Category>
     {

@@ -1,9 +1,9 @@
-﻿using Cart.Service;
+﻿using MFS.Service;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 
-namespace Cart.Api.Controllers
+namespace MFS.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

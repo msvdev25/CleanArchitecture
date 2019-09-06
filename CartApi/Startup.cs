@@ -1,7 +1,6 @@
-﻿using Cart.Data;
-using Cart.Domain;
-using Cart.Repo;
-using Cart.Service;
+﻿using MFS.Data;
+using MFS.Domain;
+using MFS.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,12 +10,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using RS2.Core;
 using System.Text;
 
-
-namespace Cart.Api
+namespace MFS.Api
 {
     public class Startup
     {
@@ -38,16 +37,78 @@ namespace Cart.Api
             // Add framework services.
             services.AddOptions();
 
-            // Identity for authentication 
+            // Identity for authentication.
             services.AddIdentity<AppUser, IdentityRole>(opt =>
             {
                 opt.User.RequireUniqueEmail = true;
                 opt.Password.RequiredLength = 6;
                 opt.Password.RequireNonAlphanumeric = true;
             })
-            .AddEntityFrameworkStores<LoginContext>()
+            .AddEntityFrameworkStores<UserContext>()
             .AddDefaultTokenProviders();
 
+            services.AddDbContext<UserContext>(options => options
+                .UseSqlServer(Configuration.GetConnectionString("LoginConnection")));
+
+            // Configure Login context. 
+            services.AddScoped<IdentityDbContext<AppUser>, UserContext>();
+
+            // Unit of work for Data operations via RS2.Core library.
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            services.AddDbContext<TranDbContext>();
+
+            // Configure Transaction DB context.
+            services.AddScoped<DbContext, TranDbContext>();
+
+            services.AddScoped<IAppClaimHandler, AppClaimHandler>();
+
+            // Authentication/Authorization configuration.
+            ConfigureAuthentication(services);
+
+            // Resolve the service dependencies.
+            DependencyHandler.Configure(services);
+
+            // Swagger configuration.
+            services.AddOpenApiDocument(document => { document.DocumentName = "Open Api"; });
+            services.AddLogging(l => l.AddEventSourceLogger());
+
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        {
+
+            app.UseHsts();
+
+            //Cors
+            app.UseCors(builder =>
+            {
+                builder.AllowAnyHeader();
+                builder.AllowCredentials();
+
+                // For any origin access.
+                //builder.AllowAnyOrigin(); 
+
+                // Enable request for specific origin (ULR address) based on config file.
+                builder.WithOrigins(Configuration.GetSection("AllowdOrigins").Get<string[]>());
+
+                // Enable for specific type (GET,POST) based on config file.
+                builder.WithMethods(Configuration.GetSection("AlloudMethods").Get<string[]>());
+
+            });
+
+            app.UseAuthentication();
+            app.UseMvc();
+
+            // Seagger documentation.
+            app.UseOpenApi(); // serve documents
+            app.UseSwaggerUi3(); // serve Swagger UI
+
+        }
+
+        private void ConfigureAuthentication(IServiceCollection services)
+        {
             // JWT token authentication.
             services.AddAuthentication(auth =>
             {
@@ -61,87 +122,24 @@ namespace Cart.Api
                 op.IncludeErrorDetails = true;
                 op.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidIssuer = Configuration["Jwt:Issuer"],
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidIssuers = Configuration.GetSection("Jwt:Issuer").Get<string[]>(),
                     ValidAudience = Configuration["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])),
                     ClockSkew = System.TimeSpan.Zero // remove delay of token when expire
                 };
             });
 
-            //if ( HostEnv.IsDevelopment())
-            //{
-            //    services.AddDbContext<LoginContext>(options => options
-            //        .UseInMemoryDatabase("LoginContext"));
-
-            //    services.AddDbContext<ShoppingContext>(options => options
-            //        .UseInMemoryDatabase("MyCart"));
-
-            //}
-            //else
+            //Authorization
+            services.AddAuthorization(auth =>
             {
-                services.AddDbContext<LoginContext>(options => options
-                    .UseSqlServer(Configuration.GetConnectionString("LoginConnection")));
-
-                services.AddDbContext<ShoppingContext>(options => options
-                    .UseSqlServer(Configuration.GetConnectionString("CartConnection")));
-            }
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-            // Configure Transaction and Login DB context.
-            services.AddScoped<DbContext, ShoppingContext>();
-            services.AddScoped<IdentityDbContext<AppUser>, LoginContext>();
-
-            ConfigureServiceDependencies(services);
-
-            services.AddOpenApiDocument(document => { document.DocumentName = "a"; });
-            services.AddSwaggerDocument(document => { document.DocumentName = "b"; });
-
-        }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseHsts();
-            }
-
-            //Cors
-            app.UseCors(builder =>
-            {
-                builder.AllowAnyHeader();
-                builder.AllowCredentials();
-
-                //builder.AllowAnyOrigin(); // For anyone access.
-
-                // Enable request for specific origin (ULR)
-                builder.WithOrigins(Configuration.GetSection("AllowdOrigins").Get<string[]>());
-
-                // Enable for specific type (GET,POST)
-                builder.WithMethods(Configuration.GetSection("AlloudMethods").Get<string[]>());
-
+                auth.AddPolicy(Constants.AdminAccess, p => p.RequireRole(Global.RoleList));
+                auth.AddPolicy(Constants.AddEditDeleteAccess, p => p.RequireRole(Role.ReadOnly.ToString(), Role.AddEditDelete.ToString(), Role.AddEdit.ToString()));
+                auth.AddPolicy(Constants.AddEditAccess, p => p.RequireRole(Role.ReadOnly.ToString(), Role.AddEdit.ToString()));
+                auth.AddPolicy(Constants.ReadOnlyAccess, p => p.RequireRole(Role.ReadOnly.ToString()));
             });
-
-            app.UseAuthentication();
-            app.UseMvc();
-
-            app.UseOpenApi(); // serve documents
-            app.UseSwaggerUi3(); // serve Swagger UI
-
         }
 
-        private void ConfigureServiceDependencies(IServiceCollection services)
-        {
-            services.AddScoped<IProductService, ProductService>();
-            services.AddScoped<ICategoryService, CategoryService>();
-
-            // Resolve the Repository dependencies.
-            DependencyHandler.RegisterDependencies(services);
-
-        }
     }
 }

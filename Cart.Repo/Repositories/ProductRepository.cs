@@ -1,10 +1,10 @@
 ﻿using System.Linq;
 using RS2.Core;
 using Microsoft.EntityFrameworkCore;
-using Cart.Domain;
+using MFS.Domain;
 using Microsoft.Extensions.Logging;
 
-namespace Cart.Repo
+namespace MFS.Repo
 {
 	public interface IProductRepository : IRepositoryBase<Product, long> { }
 

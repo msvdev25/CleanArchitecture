@@ -1,12 +1,10 @@
-﻿using Cart.Domain;
-using Cart.Repo;
+﻿using MFS.Domain;
+using MFS.Repo;
 using RS2.Core;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace Cart.Service
+namespace MFS.Service
 {
 
     public interface IProductService
@@ -20,7 +18,7 @@ namespace Cart.Service
         Task<bool> DeleteProduct(long Id);
     }
 
-    public class ProductService : IProductService
+    internal class ProductService : IProductService
     {
         private readonly IProductRepository productRepository;
         private readonly IUnitOfWork unitOfWork;

@@ -1,7 +1,7 @@
-﻿using Cart.Domain;
+﻿using MFS.Domain;
 using RS2.Core;
 
-namespace Cart.Repo
+namespace MFS.Repo
 {
 	public interface ICategoryRepository : IRepositoryBase<Category, int> { }
 
