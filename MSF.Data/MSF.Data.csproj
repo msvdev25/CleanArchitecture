@@ -10,6 +10,6 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MFS.Domain\MSF.Domain.csproj" />
+    <ProjectReference Include="..\MSF.Domain\MSF.Domain.csproj" />
   </ItemGroup>
 </Project>
