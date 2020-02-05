@@ -1,4 +1,4 @@
-﻿using MSF.Core;
+﻿using Core.Data;
 
 namespace MSF.Domain
 {

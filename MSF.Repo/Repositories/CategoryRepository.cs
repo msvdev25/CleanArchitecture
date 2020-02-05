@@ -1,9 +1,9 @@
 ﻿using MSF.Domain;
-using MSF.Core;
+using Core.Data;
 
 namespace MSF.Repo
 {
-	public interface ICategoryRepository : IBaseRepository<Category, int> { }
+	public interface ICategoryRepository : IRepository<Category, int> { }
 
 	internal class CategoryRepository : BaseRepository<Category, int>, ICategoryRepository
 	{

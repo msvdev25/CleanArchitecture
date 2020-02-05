@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MSF.Data\MSF.Data.csproj" />
     <ProjectReference Include="..\MSF.Domain\MSF.Domain.csproj" />
     <ProjectReference Include="..\MSF.Service\MSF.Service.csproj" />
   </ItemGroup>

@@ -1,9 +1,7 @@
-﻿using MSF.Domain;
-using MSF.Service;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MSF.Core;
+using MSF.Domain;
+using MSF.Service;
 using System;
 using System.Threading.Tasks;
 

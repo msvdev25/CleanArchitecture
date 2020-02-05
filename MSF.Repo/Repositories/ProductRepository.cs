@@ -1,12 +1,12 @@
 ﻿using System.Linq;
-using MSF.Core;
+using Core.Data;
 using Microsoft.EntityFrameworkCore;
 using MSF.Domain;
 using Microsoft.Extensions.Logging;
 
 namespace MSF.Repo
 {
-	public interface IProductRepository : IBaseRepository<Product, long> { }
+	public interface IProductRepository : IRepository<Product, long> { }
 
 	internal class ProductRepository : BaseRepository<Product, long>, IProductRepository
 	{
@@ -18,7 +18,6 @@ namespace MSF.Repo
 		{			
 			return Entity.Include(e => e.Category).Where(p => !incluedeDelete || !p.InActive);
 		}
-
         
 	}
 }

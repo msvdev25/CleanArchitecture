@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MSF.Api
+namespace MSF.Service
 {
     public static class Constants
     {
@@ -15,8 +15,5 @@ namespace MSF.Api
 
         public const string AddEditDeleteAccess = "AddEditDeleteAccess";
 
-        public const string TenantDbClaim = "TenantDbClaim";
-
-        public const string TenantNameClaim = "TenantNameClaim";
     }
 }

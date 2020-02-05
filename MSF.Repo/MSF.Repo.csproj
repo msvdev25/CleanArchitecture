@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
@@ -9,7 +9,6 @@
   <ProjectExtensions><VisualStudio><UserProperties DependencyConfig_1json__JSONSchema="http://json.schemastore.org/config" /></VisualStudio></ProjectExtensions>
 
   <ItemGroup>
-    <ProjectReference Include="..\MSF.Data\MSF.Data.csproj" />
     <ProjectReference Include="..\MSF.Domain\MSF.Domain.csproj" />
   </ItemGroup>
 

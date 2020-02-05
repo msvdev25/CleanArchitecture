@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using MSF.Core;
+using Core.Data;
 
 namespace MSF.Domain
 {

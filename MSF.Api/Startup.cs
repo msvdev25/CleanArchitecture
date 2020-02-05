@@ -1,30 +1,25 @@
-﻿using MSF.Data;
-using MSF.Domain;
-using MSF.Service;
+﻿using Core.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using MSF.Core;
+using MSF.Data;
+using MSF.Domain;
+using MSF.Service;
 using System.Text;
 
 namespace MSF.Api
 {
     public class Startup
     {
-        private readonly IHostingEnvironment HostEnv;
 
-        public Startup(IConfiguration configuration, IHostingEnvironment env)
+        public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            this.HostEnv = env;
         }
 
         public IConfiguration Configuration { get; }
@@ -37,40 +32,20 @@ namespace MSF.Api
             // Add framework services.
             services.AddOptions();
 
-            // Identity for authentication.
-            services.AddIdentity<AppUser, IdentityRole>(opt =>
-            {
-                opt.User.RequireUniqueEmail = true;
-                opt.Password.RequiredLength = 6;
-                opt.Password.RequireNonAlphanumeric = true;
-            })
-            .AddEntityFrameworkStores<UserContext>()
-            .AddDefaultTokenProviders();
-
-            services.AddDbContext<UserContext>(options => options
-                .UseSqlServer(Configuration.GetConnectionString("LoginConnection")));
-
-            // Configure Login context. 
-            services.AddScoped<IdentityDbContext<AppUser>, UserContext>();
-
-            // Unit of work for Data operations via MSF.Core library.
+            // Unit of work for Data operations via Core.Data library.
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-            services.AddDbContext<TranDbContext>();
-
-            // Configure Transaction DB context.
-            services.AddScoped<DbContext, TranDbContext>();
-
-            services.AddScoped<IAppClaimHandler, AppClaimHandler>();
 
             // Authentication/Authorization configuration.
             ConfigureAuthentication(services);
 
+            // Resolve the service DB Context dependencies.
+            services.ConfigureDataContext(Configuration);
+            
             // Resolve the service dependencies.
-            DependencyHandler.Configure(services);
+            services.ConfigureServices();
 
             // Swagger configuration.
-            services.AddOpenApiDocument(document => { document.DocumentName = "Open Api"; });
+             services.AddOpenApiDocument(document => { document.DocumentName = "Open Api"; });
             services.AddLogging(l => l.AddEventSourceLogger());
 
         }
@@ -103,7 +78,7 @@ namespace MSF.Api
 
             // Seagger documentation.
             app.UseOpenApi(); // serve documents
-            app.UseSwaggerUi3(); // serve Swagger UI
+            app.UseSwaggerUi3(s => { s.WithCredentials = true; } ); // serve Swagger UI
 
         }
 
@@ -124,22 +99,22 @@ namespace MSF.Api
                 {
                     ValidateIssuer = true,
                     ValidateAudience = true,
-                    ValidIssuers = Configuration.GetSection("Jwt:Issuer").Get<string[]>(),
+                    //ValidIssuer = Configuration["Jwt:Issuer"],
+                    ValidIssuers = Configuration.GetSection("Jwt:Issueres").Get<string[]>(),
                     ValidAudience = Configuration["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])),
-                    ClockSkew = System.TimeSpan.Zero // remove delay of token when expire
+                    ClockSkew = System.TimeSpan.Zero // Remove delay of token when expire                
                 };
             });
 
-            //Authorization
+            //Authorization [policy based]
             services.AddAuthorization(auth =>
             {
-                auth.AddPolicy(Constants.AdminAccess, p => p.RequireRole(Global.RoleList));
-                auth.AddPolicy(Constants.AddEditDeleteAccess, p => p.RequireRole(Role.ReadOnly.ToString(), Role.AddEditDelete.ToString(), Role.AddEdit.ToString()));
-                auth.AddPolicy(Constants.AddEditAccess, p => p.RequireRole(Role.ReadOnly.ToString(), Role.AddEdit.ToString()));
-                auth.AddPolicy(Constants.ReadOnlyAccess, p => p.RequireRole(Role.ReadOnly.ToString()));
+                auth.AddPolicy(Constants.AdminAccess, p => { p.RequireRole(Role.Admin.ToString()); p.RequireAuthenticatedUser(); });
+                auth.AddPolicy(Constants.AddEditDeleteAccess, p => { p.RequireRole(Role.Admin.ToString(), Role.AddEditDelete.ToString()); p.RequireAuthenticatedUser(); });
+                auth.AddPolicy(Constants.AddEditAccess, p => { p.RequireRole(Role.AddEdit.ToString(), Role.Admin.ToString(), Role.AddEditDelete.ToString() ); p.RequireAuthenticatedUser(); });
+                auth.AddPolicy(Constants.ReadOnlyAccess, p => { p.RequireAuthenticatedUser(); });
             });
         }
-
     }
 }

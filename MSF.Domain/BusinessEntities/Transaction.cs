@@ -1,10 +1,10 @@
-﻿using MSF.Core;
+﻿using Core.Data;
 using System;
 using System.Collections.Generic;
 
 namespace MSF.Domain
 {
-    public class Transaction:BaseTransactionalEntity<long>
+    public class Transaction:BaseEntityTrackable<long>
     {
         public Transaction()
         {
@@ -27,7 +27,7 @@ namespace MSF.Domain
 
     }
 
-    public class TransactionDetails:BaseTransactionalEntity<long>
+    public class TransactionDetails:BaseEntityTrackable<long>
     {
         public int ProductId { get; set; }
 

@@ -4,28 +4,19 @@ using System.Reflection;
 
 namespace MSF.Repo
 {
-    public sealed class DependencyHandler
+    public static class DependencyHandler
     {
-        private static bool IsDependencyRegisted;
 
-        private DependencyHandler()
+        public static void ConfigureRepository(this IServiceCollection services)
         {
-            IsDependencyRegisted = false;
-        }
+            services.AddScoped<ITenantHandler, TenantHandler>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
 
-        public static void Configure(IServiceCollection services)
-        {
-            if (!IsDependencyRegisted)
-            {
-                services.AddScoped<ITenantHandler, TenantHandler>();
+            //Assembly assembly = Assembly.LoadFile(Assembly.GetExecutingAssembly().Location);
 
-                Assembly assembly = Assembly.LoadFile(Assembly.GetExecutingAssembly().Location);
+            //foreach (var type in assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract && t.Name.EndsWith("Repository")))
+            //    services.Add(new ServiceDescriptor(type.GetInterfaces().First(i => i.Name.EndsWith(type.Name)), type, ServiceLifetime.Scoped));
 
-                foreach (var type in assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract && t.Name.EndsWith("Repository")))
-                    services.Add(new ServiceDescriptor(type.GetInterfaces().First(i => i.Name.EndsWith(type.Name)), type, ServiceLifetime.Scoped));
-
-                IsDependencyRegisted = true;
-            }
         }
 
     }

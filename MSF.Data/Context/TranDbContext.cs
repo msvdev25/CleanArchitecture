@@ -1,29 +1,31 @@
 ﻿using MSF.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Http;
+using System.Linq;
 
 namespace MSF.Data
 {
     public class TranDbContext : DbContext
     {
         private readonly string connectionString;
-        private readonly IAppClaimHandler claimHandler;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
         public TranDbContext(
             DbContextOptions<TranDbContext> options,
             IConfiguration config,
-            IAppClaimHandler claimHandler
+            IHttpContextAccessor httpContextAccessor
             )
             : base(options)
-        {
-            Database.EnsureCreated();
+        {            
             connectionString = config.GetConnectionString("TranDbConnection");
-            this.claimHandler = claimHandler;
+            this.httpContextAccessor = httpContextAccessor;
+            Database.EnsureCreated();            
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            string dbName = claimHandler.GetTenantDbName();
+            string dbName = httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.UserData).Value;
 
             optionsBuilder.UseSqlServer(string.Format(connectionString, dbName));
             base.OnConfiguring(optionsBuilder);

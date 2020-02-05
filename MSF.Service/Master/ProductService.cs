@@ -1,6 +1,6 @@
 ﻿using MSF.Domain;
 using MSF.Repo;
-using MSF.Core;
+using Core.Data;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

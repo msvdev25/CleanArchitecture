@@ -1,6 +1,6 @@
 ﻿using MSF.Domain;
 using Microsoft.Extensions.Logging;
-using MSF.Core;
+using Core.Data;
 using System;
 using System.Collections.Generic;
 using System.Text;

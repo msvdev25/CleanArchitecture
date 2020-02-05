@@ -12,12 +12,12 @@ namespace MSF.Api.Controllers
     {
         #region Init
 
-        private readonly ICommonService _commonService;
+        private readonly IUserService _userService;
 
         public UserController(
-            ICommonService commonService)
+            IUserService commonService)
         {
-            this._commonService = commonService;
+            this._userService = commonService;
         }
 
         #endregion
@@ -27,19 +27,15 @@ namespace MSF.Api.Controllers
         [HttpPost("GetToken")]
         public async Task<IActionResult> GetAccessToken([FromBody]LoginViewModel userModel)
         {
-            IActionResult response = Unauthorized();
-
             try
             {
-                var access = await _commonService.GetAccessToken(userModel);
-                response = Ok(access);
+                var access = await _userService.GetAccessToken(userModel);
+                return Ok(access);
             }
-            catch (Exception ex)
+            catch
             {
-                response = StatusCode(500, ex.Message);
-            }
-
-            return response;
+                return Unauthorized();
+            }            
         }
 
         [HttpPost("Register")]
@@ -47,16 +43,18 @@ namespace MSF.Api.Controllers
         {
             if (string.IsNullOrEmpty(userModel.UserEmail) ||
                 string.IsNullOrEmpty(userModel.Password))
+            {
                 return StatusCode(500, "UserEmail/Password id required");
+            }
 
             try
             {
-                if (await _commonService.RegisterUser(userModel))
+                if (await _userService.RegisterUser(userModel))
                     return Ok();
             }
             catch (Exception ex)
             {
-                return StatusCode(400, ex.Message);
+                return StatusCode(500, ex.Message);
             }
 
             return StatusCode(500);
@@ -65,7 +63,7 @@ namespace MSF.Api.Controllers
         [HttpGet("isUniqueMail")]
         public async Task<bool> IsUniqueEmail(string eMail, string userId)
         {
-            return await _commonService.IsUniqueEmail(eMail, userId);
+            return await _userService.IsUniqueEmail(eMail, userId);
 
         }
 
@@ -76,20 +74,33 @@ namespace MSF.Api.Controllers
         [HttpPost("AddTenant")]
         public async Task<IActionResult> AddTenant(Tenant tenant)
         {
-            await _commonService.SaveTenant(tenant);
-            return Ok();
+            try
+            {
+                await _userService.SaveTenant(tenant);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+
         }
 
         [HttpGet("GetTenants")]
         public async Task<IActionResult> GetAllTenants()
         {
-            return Ok(await _commonService.GetTenants());
+            return Ok(await _userService.GetTenants());
         }
 
         [HttpPost("AssignUserToTenant")]
         public async Task AssignUserToTenant([FromBody]UserTenantViewModel userTenant)
         {
-            await _commonService.AssignUserToTenant(userTenant);
+            await _userService.AssignUserToTenant(userTenant);
+        }
+
+        public async Task SetCurrentTenant(Tenant tenant)
+        {
+            await _userService.SaveTenant(tenant);
         }
 
         #endregion

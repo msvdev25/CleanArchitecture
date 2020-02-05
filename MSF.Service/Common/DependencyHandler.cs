@@ -1,33 +1,26 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using System.Reflection;
+using MSF.Repo;
 
 namespace MSF.Service
 {
-    public sealed class DependencyHandler
+    public static class DependencyHandler
     {
-        private static bool IsDependencyRegisted;
-
-        private DependencyHandler()
+        public static void ConfigureServices(this IServiceCollection services)
         {
-            IsDependencyRegisted = false;
-        }
 
-        public static void Configure(IServiceCollection services)
-        {
-            if (!IsDependencyRegisted)
-            {
-                services.AddScoped<ICommonService, CommonService>();
+            // Resolve repository dependencies.
+            services.ConfigureRepository();
 
-                Assembly assembly = Assembly.LoadFile(Assembly.GetExecutingAssembly().Location);
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ICategoryService, CategoryService>();
 
-                foreach (var type in assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract && t.Name.EndsWith("Service")))
-                    services.Add(new ServiceDescriptor(type.GetInterfaces().First(i => i.Name.EndsWith(type.Name)), type, ServiceLifetime.Scoped));
+            //Assembly assembly = Assembly.LoadFile(Assembly.GetExecutingAssembly().Location);
 
-                IsDependencyRegisted = true;
+            //foreach (var type in assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract && t.Name.EndsWith("Service")))
+            //    services.Add(new ServiceDescriptor(type.GetInterfaces().First(i => i.Name.EndsWith(type.Name)), type, ServiceLifetime.Scoped));
 
-                Repo.DependencyHandler.Configure(services);
-            }
         }
 
     }
